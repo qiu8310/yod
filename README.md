@@ -124,7 +124,7 @@ yod('@Boolean');  // return true or false.
 
 ### yod.emptyTypes()
 
-Remote all defined types.
+Remove all defined types.
 
 ### yod.modifier([filters,] name, modifierFn)
 

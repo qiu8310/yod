@@ -19,9 +19,13 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
+    "*.sh",
+    "*.js",
     "node_modules",
     "bower_components",
     "test",
+    "example",
+    "jsdoc.json",
     "src",
     "jim",
     "docs",
