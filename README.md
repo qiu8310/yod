@@ -16,36 +16,249 @@ Fantasy data generator.
 
 ## Usage
 
+```
+// Create a String type to generate random string.
+yod.type('String', function(len) {
+  len = len || Math.round(Math.random() * 10);
+  var pool = 'abcdefghigklmnopqrstuvwxyz';
+  var poolLen = pool.length;
+  var result = '';
+  for (var i = 0; i < poolLen; i++) {
+    result += pool[Math.round(Math.random() * (poolLen - 1))]
+  }
+  return result;
+});
 
+// Create a Int type to generate random integer.
+yod.type('Int', function() {
+  return Math.round(Math.random() * 100);
+});
 
-## Warning
+// Create a User type.
 
-* ${@String.repeat()} 结构中：
+yod.type('User', {
+  name: '@String(5)',
+  age: '@Int'
+});
 
-  - 括号中的参数不能带有 ")"，否则会导致解析失败，比如：@String.replace(")", "") 会解析成 @String.replace(")
+// And then you can generate random User by calling `yod('@User')`.
 
-* ${@String.repeat} 结构中，${ 后面和 } 前面都不能含有空格
+yod('@User'); // Will create a random object like: `{name: 'atx', age: 30}`.
+
+```
+
 
 ## API
 
-### yod(anything)
+## Terminology
+
+* __Caller__: Prepend with a `"@"` character, follow by series string which like function calling.
+  
+  e.g: `@Bool`, `@String.repeat(3).join(",")`, `@Self.someKey`.
+
+* __Generator__: The source that can generate other thing, in `yod`, generator can be anything.
+
+
+### yod(generator)
+
+Parameter: `generator`, Type: `*`
+
+Use the `generator` as a generator to get other generated value.
+
+In `generator`, you can use caller string, you can execute javascript, you can get config value.
+
+#### Yod example:
+
+```
+// Execute javascript, wrapped in "`" (just calling `eval` to get the result)
+yod("` 1 + 3 `");     // => 4
+yod("` 'a' + 3 `");   // => 'a3'
+
+// Use caller string
+yod({ a: "a", b: "a's value is @Self.a" });   // => {a: "a", b: "a's value is a"}
+
+// get config value
+
+yod.config("a.b", "1"); // At first, use [yod.config](#yodconfigkey--val--meta) set a value
+
+yod("@Config.a"); // => {b: "1"}
+
+```
 
 ### yod.type(name, generator [, aliases...])
 
+Parameter: `name`, Type: `String`
+
+Parameter: `generator`, Type: `*`
+
+Parameter: `aliases`, Type: `String` or `String Array`, optional
+
+Create a new type, so that you can use it in caller string.
+
+#### Type example:
+
+```
+// Create a Bool type, and alias Boolean. it will random return true or false.
+
+yod.type('Bool', function() {
+
+  return Math.round(Math.random() * 100) % 2 === 0;
+
+}, 'Boolean');
+
+// Call your new type.
+
+yod('@Bool');     // return true or false.
+yod('@Boolean');  // return true or false.
+
+```
+
 ### yod.emptyTypes()
+
+Remote all defined types.
 
 ### yod.modifier([filters,] name, modifierFn)
 
+Parameter: `filters`, Type: `String` or `Function` or `Array of String/Function`, optional
+
+Parameter: `name`, Type: `String`
+
+Parameter: `modifierFn`, Type: `Function`
+
+Create a new modifier. 
+
+__There are two type or modifier__
+
+* Value modifier: modifier generator value.
+* Function modifier: modifier generator function. Create it with ":" prepend to `name` 
+
+
+#### Modifier example:
+
+__Create a value modifier: index —— Get array's index item__
+
+```
+yod.modifier('Array', 'index', function(val, index) {
+  return val[index];
+});
+
+
+// Use it
+
+yod({
+  a: ['a', 'b', 'c']
+  b: '@Self.a.index[1]'
+});
+
+// => {a: ['a', 'b', 'c'], b: 'b'}
+
+```
+
+__Create a function modifier: repeat —— Generate value array using generator function__
+
+```
+yod.modifier('repeat', function(generatorFn, times) {
+  var result = [];
+  for (var i = 0; i < times; i++) {
+    result.push(generatorFn());
+  }
+  return result;
+});
+
+
+// Use it (@Bool is defined in [yod.type](#yodtypename-generator--aliases) area)
+
+yod('@Bool.repeat(3)'); 
+// Will generator a array like this: [true, false, false]. the boolean value is random. 
+
+```
+
+
 ### yod.emptyModifiers()
+
+Remove all defined modifiers.
 
 ### yod.config(key [, val] [, meta])
 
+Parameter: `key`, Type: `String`
+
+Parameter: `val`, Type: `*`
+
+Parameter: `meta`, Type: `*`
+
+Get or set a config key. When set a key, you can also set a meta on this key.
+
+If you want get the value and the meta, you can append a string ":meta" to the `key`,
+then the result will be something like this: `{val: ..., meta: ...}`
+
+#### Config example:
+
+```
+// Set
+
+yod.config('a.b', 'ab');
+yod.config('a.c', 'ac', 'ac-meta');
+
+// Get
+yod.config('a');        // => {b: 'ab', c: 'ac'}
+yod.config('a:meta');   // => {val: {b: 'ab', c: 'ac'}, meta: undefined}
+yod.config('a.c');      // => 'ac'
+yod.config('a.c:meta'); // => {val: 'ac', meta: 'ac-meta'}
+
+// Using in caller string. (You can't get meta data in this way, but you can get it by adding a modifier)
+yod('@Config.a');       // => {b: 'ab', c: 'ac'}
+yod('@Config.a.c');     // => 'ac'
+
+```
+
+
 ### yod.config.all
+
+Type: `Object`
+
+All config data.
 
 ### yod.config.meta
 
+Type: `Object`
+
+All meta data.
 
 
+## Wrong user case
+
+
+* Caller string's arguments can not include ")".
+
+  ```
+  @String.replace(")", "") 
+  // Will parsed to `@String.replace('"')`
+  ```
+  
+* Object generator can not recycle depends.
+
+  ```
+  yod({
+    a: '@Self.b',
+    b: '@Self.a'
+  });
+  
+  // Will throw error.
+  ```
+  
+* Child object can't depend on it parents, similar to recycle depends.
+
+  ```
+  yod({
+    a: {
+      b: {
+        c: '@Parent.Parent.a
+      }
+    }
+  });
+  
+  // Will throw error.
+  ```
 
 ## Install
 
