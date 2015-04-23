@@ -8,32 +8,15 @@
 [![Coverage Status][coveralls-image]][coveralls-url]
 
 
-
-Your data generator.
-
-
-[Github Repo][project-url]
-
-[JSDOC Generated Document](http://qiu8310.github.io/yod)
+Fantasy data generator.
 
 
-## Install
-
-```bash
-$ npm install --save yod
-```
+[Online Data Generator](http://qiu8310.github.io/yod)
 
 
 ## Usage
 
-```javascript
-var yod = require('yod');
-yod(); // "awesome"
-```
 
-## API
-
-_(Coming soon)_
 
 ## Warning
 
@@ -43,32 +26,40 @@ _(Coming soon)_
 
 * ${@String.repeat} 结构中，${ 后面和 } 前面都不能含有空格
 
+## API
 
-## Some Data Provider
-[cool-ascii-faces](https://github.com/maxogden/cool-ascii-faces)
-[emoji](https://github.com/muan/emoji)
+### yod(anything)
+
+### yod.type(name, generator [, aliases...])
+
+### yod.emptyTypes()
+
+### yod.modifier([filters,] name, modifierFn)
+
+### yod.emptyModifiers()
+
+### yod.config(key [, val] [, meta])
+
+### yod.config.all
+
+### yod.config.meta
+
+
+
+
+## Install
+
+### Browser
+
+### Node
+
+
 
 
 ## Contributing
 
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [gulp](http://gulpjs.com/).
 
-
-## Reference
-* [CI Test for Browser](https://ci.testling.com/) - Run your browser tests on every push, demo project [js-traverse](https://github.com/substack/js-traverse)
-* [GA on Github](https://github.com/igrigorik/ga-beacon) - Google Analytics collector-as-a-service (using GA measurement protocol).
-* [idiomatic.js](https://github.com/rwaldron/idiomatic.js) - Principles of Writing Consistent, Idiomatic JavaScript
-* [Use jsdoc](http://usejsdoc.org/index.html)
-* [Using the ES6 transpiler Babel on Node.js](http://www.2ality.com/2015/03/babel-on-node.html)
-* [Node Collection](https://github.com/npm/newww/issues/313)
-  - [http://tools.ampersandjs.com/](http://tools.ampersandjs.com/)
-  - [https://github.com/sindresorhus/awesome-nodejs](https://github.com/sindresorhus/awesome-nodejs)
-  - [https://www.npmjs.com/package/frontend-npm-goodies](https://www.npmjs.com/package/frontend-npm-goodies)
-  - [https://github.com/Raynos/http-framework/wiki/Modules#response](https://github.com/Raynos/http-framework/wiki/Modules#response)
-  - [https://github.com/npm-dom](https://github.com/npm-dom)
-  - [https://www.npmjs.com/package/mad-science-modules](https://www.npmjs.com/package/mad-science-modules)
-  - [https://www.npmjs.com/package/npm-collection-language-tools#readme](https://www.npmjs.com/package/npm-collection-language-tools#readme)
-  - And more...
 
 
 ## License

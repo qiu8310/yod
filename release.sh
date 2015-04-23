@@ -24,10 +24,13 @@ if test $# -gt 0; then
     echo '\033[31m version update failed \033[0m'
     exit 1
   fi
+
+  ./node_modules/.bin/webpack src/yod.js --output-file="browser/yod.js"
+  ./node_modules/.bin/webpack src/yod.js --output-file="browser/yod.min.js" --optimize-minimize
+  cp browser/yod.* gh-pages
+
   git-changelog -t $1 \
     && git-release $1 \
-    && echo 'publish docs to gh-pages branch' \
-    && sh './publish_docs.sh' \
     && echo 'npm publish ... ' \
     && npm publish
 else

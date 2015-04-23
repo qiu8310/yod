@@ -9,6 +9,7 @@
 var _ = require('lodash');
 
 var gen = require('./lib/generator'),
+  config = require('./lib/config'),
   tm = require('./lib/tm');
 
 /**
@@ -94,5 +95,18 @@ yod.emptyTypes = function() { tm.clean('type'); };
  */
 yod.emptyModifiers = function() { tm.clean('modifier'); };
 
+
+/**
+ * Set or get config key.
+ *
+ * @type {Function}
+ * @param {String} key
+ * @param {*} [val]
+ * @param {Object} [meta]
+ * @returns {*}
+ */
+yod.config = config;
+
+if (typeof window !== 'undefined') { window.yod = yod; }
 
 module.exports = yod;

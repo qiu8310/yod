@@ -12,6 +12,8 @@ var dep = require('dep.js');
 var helper = require('./helper');
 var tm = require('./tm');
 
+var allConfig = require('./config').all;
+
 /**
  * Call a caller.
  * @param {String} caller
@@ -22,6 +24,7 @@ var tm = require('./tm');
 function _call(caller, pair) {
   var series = helper.parseCaller(caller);
   var sp = ['Self', 'Parent'];
+  var firstSer = series[0], value;
 
   // parse series's arguments till end to true.
   _.each(series, function(ser) {
@@ -31,8 +34,8 @@ function _call(caller, pair) {
     });
   });
 
-  if (_.includes(sp, series[0].name)) {
-    var depSeres = [], objSeres = [], value;
+  if (_.includes(sp, firstSer.name) && !firstSer.args.length) { // Parse @Self and @Parent
+    var depSeres = [], objSeres = [];
     var flag = 0;
 
     _.each(series, function(ser) {
@@ -52,6 +55,22 @@ function _call(caller, pair) {
     if (!objSeres.length) { return value; }
 
     return tm.fnGenerator(function() { return value; }, objSeres)();
+
+  } else if (firstSer.name === 'Config' && !firstSer.args.length) { // Parse @Config
+    series.shift(); // Shift '@Config'
+    var ser = series[0];
+    value = allConfig;
+    if (!ser || ser.args.length || !value.hasOwnProperty(ser.name)) {
+      throw new Error('Config key "' + (ser && ser.name || '') + '" not found.');
+    }
+
+    series.shift();
+    while (ser && !ser.args.length && value.hasOwnProperty(ser.name)) {
+      value = value[ser.name];
+      ser = series.shift();
+    }
+
+    return tm.fnGenerator(function() { return value; }, series)();
 
   } else {
     return tm.generator(series)();
