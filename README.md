@@ -16,8 +16,9 @@ Fantasy data generator.
 
 ## Usage
 
+__Create a String type to generate random string.__
+
 ```
-// Create a String type to generate random string.
 yod.type('String', function(len) {
   len = len || Math.round(Math.random() * 10);
   var pool = 'abcdefghigklmnopqrstuvwxyz';
@@ -28,27 +29,32 @@ yod.type('String', function(len) {
   }
   return result;
 });
+```
 
-// Create a Int type to generate random integer.
+__Create a Int type to generate random integer.__
+
+```
 yod.type('Int', function() {
   return Math.round(Math.random() * 100);
 });
+```
 
-// Create a User type.
+__Create a User type.__
 
+```
 yod.type('User', {
   name: '@String(5)',
   age: '@Int'
 });
-
-// And then you can generate random User by calling `yod('@User')`.
-
-yod('@User'); // Will create a random object like: `{name: 'atx', age: 30}`.
-
 ```
 
+__And then you can generate random User by calling `yod('@User')`.__
 
-## API
+```
+yod('@User'); 
+
+// Will create a random object like: `{name: 'atx', age: 30}`.
+```
 
 ## Terminology
 
@@ -57,6 +63,9 @@ yod('@User'); // Will create a random object like: `{name: 'atx', age: 30}`.
   e.g: `@Bool`, `@String.repeat(3).join(",")`, `@Self.someKey`.
 
 * __Generator__: The source that can generate other thing, in `yod`, generator can be anything.
+
+
+## API
 
 
 ### yod(generator)
@@ -74,13 +83,13 @@ In `generator`, you can use caller string, you can execute javascript, you can g
 yod("` 1 + 3 `");     // => 4
 yod("` 'a' + 3 `");   // => 'a3'
 
+
 // Use caller string
 yod({ a: "a", b: "a's value is @Self.a" });   // => {a: "a", b: "a's value is a"}
 
+
 // get config value
-
-yod.config("a.b", "1"); // At first, use [yod.config](#yodconfigkey--val--meta) set a value
-
+yod.config("a.b", "1"); // At first, use yod.config set a value
 yod("@Config.a"); // => {b: "1"}
 
 ```
@@ -99,15 +108,15 @@ Create a new type, so that you can use it in caller string.
 
 ```
 // Create a Bool type, and alias Boolean. it will random return true or false.
-
 yod.type('Bool', function() {
 
   return Math.round(Math.random() * 100) % 2 === 0;
 
 }, 'Boolean');
 
-// Call your new type.
 
+
+// Call your new type.
 yod('@Bool');     // return true or false.
 yod('@Boolean');  // return true or false.
 
@@ -149,7 +158,6 @@ yod({
   a: ['a', 'b', 'c']
   b: '@Self.a.index[1]'
 });
-
 // => {a: ['a', 'b', 'c'], b: 'b'}
 
 ```
@@ -166,9 +174,9 @@ yod.modifier('repeat', function(generatorFn, times) {
 });
 
 
-// Use it (@Bool is defined in [yod.type](#yodtypename-generator--aliases) area)
+// Use it (@Bool is defined in yod.type area)
 
-yod('@Bool.repeat(3)'); 
+yod('@Bool.repeat(3)');
 // Will generator a array like this: [true, false, false]. the boolean value is random. 
 
 ```
@@ -195,15 +203,16 @@ then the result will be something like this: `{val: ..., meta: ...}`
 
 ```
 // Set
-
 yod.config('a.b', 'ab');
 yod.config('a.c', 'ac', 'ac-meta');
+
 
 // Get
 yod.config('a');        // => {b: 'ab', c: 'ac'}
 yod.config('a:meta');   // => {val: {b: 'ab', c: 'ac'}, meta: undefined}
 yod.config('a.c');      // => 'ac'
 yod.config('a.c:meta'); // => {val: 'ac', meta: 'ac-meta'}
+
 
 // Using in caller string. (You can't get meta data in this way, but you can get it by adding a modifier)
 yod('@Config.a');       // => {b: 'ab', c: 'ac'}
@@ -264,8 +273,16 @@ All meta data.
 
 ### Browser
 
+```
+bower install yod --save-dev
+```
+
+
 ### Node
 
+```
+npm install yod --save
+```
 
 
 

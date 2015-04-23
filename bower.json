@@ -1,0 +1,32 @@
+{
+  "name": "yod",
+  "version": "0.1.0",
+  "homepage": "https://github.com/qiu8310/yod",
+  "authors": [
+    "Mora <qiuzhongleiabc@126.com>"
+  ],
+  "description": "Fantasy data generator.",
+  "main": "browser/yod.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "yod",
+    "mock",
+    "data",
+    "generator"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src",
+    "jim",
+    "docs",
+    "coverage",
+    "gh-pages",
+    "tests"
+  ]
+}

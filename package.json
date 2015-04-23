@@ -1,7 +1,7 @@
 {
   "name": "yod",
-  "description": "Your data generator.",
-  "version": "0.0.0",
+  "description": "Fantasy data generator.",
+  "version": "0.1.0",
   "homepage": "https://github.com/qiu8310/yod",
   "bugs": "https://github.com/qiu8310/yod/issues",
   "license": "MIT",
