@@ -11,7 +11,7 @@
 Fantasy data generator.
 
 
-[Online Data Generator](http://qiu8310.github.io/yod)
+[Online Object Data Generator](http://qiu8310.github.io/yod)
 
 
 ## Usage
