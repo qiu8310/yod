@@ -26,13 +26,54 @@
   More on http://www.clock.co.uk/blog/tools-for-unit-testing-and-quality-assurance-in-node-js
 */
 
-var yod = require('../');
+var fs = require('fs');
+var path = require('path');
+
 var assert = require('should');
+var _ = require('lodash');
+
+var yod = require('../');
+
 
 describe('yod', function () {
 
-  it('should be awesome', function () {
-    yod().should.equal('awesome');
+  context('example', function() {
+    var only, dir = path.join(__dirname, '..', 'example');
+
+    //only = '3';
+
+    _.each(fs.readdirSync(dir), function(basename) {
+      var fn = function() {
+        yod.emptyModifiers();
+        yod.emptyTypes();
+        require(path.resolve(dir, basename))(yod, assert, _);
+      };
+      if (basename.indexOf(only) === 0) {
+        it.only(basename, fn);
+      } else {
+        it(basename, fn);
+      }
+    });
+  });
+
+
+  it('throws', function() {
+    // yod
+    yod.should.throw('yod(generator) can only accept one argument.');
+
+    // type
+    (function(){yod.type();}).should.throw('yod.type(name, generator[, aliases...]) need at least two arguments.');
+
+    (function(){yod.type(1, '2');}).should.throw('Type name "1" should be a string.');
+
+    (function(){yod.type('A', '2', 1);}).should.throw('Type alias "1" should also be a string.');
+
+    // modifier
+
+    (function(){yod.modifier();}).should.throw('yod.modifier([filters, ]name, modifierFn) need two or three arguments.');
+    (function(){yod.modifier(123, function(){});}).should.throw('Modifier name "123" should be a string.');
+    (function(){yod.modifier('a', '123');}).should.throw('Modifier function "123" should be a function.');
+
   });
 
 });

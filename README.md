@@ -35,6 +35,19 @@ yod(); // "awesome"
 
 _(Coming soon)_
 
+## Warning
+
+* ${@String.repeat()} 结构中：
+
+  - 括号中的参数不能带有 ")"，否则会导致解析失败，比如：@String.replace(")", "") 会解析成 @String.replace(")
+
+* ${@String.repeat} 结构中，${ 后面和 } 前面都不能含有空格
+
+
+## Some Data Provider
+[cool-ascii-faces](https://github.com/maxogden/cool-ascii-faces)
+[emoji](https://github.com/muan/emoji)
+
 
 ## Contributing
 
