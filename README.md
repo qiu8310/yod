@@ -18,7 +18,7 @@ Fantasy data generator.
 
 __Create a String type to generate random string.__
 
-```
+```javascript
 yod.type('String', function(len) {
   len = len || Math.round(Math.random() * 10);
   var pool = 'abcdefghigklmnopqrstuvwxyz';
@@ -33,7 +33,7 @@ yod.type('String', function(len) {
 
 __Create a Int type to generate random integer.__
 
-```
+```javascript
 yod.type('Int', function() {
   return Math.round(Math.random() * 100);
 });
@@ -41,7 +41,7 @@ yod.type('Int', function() {
 
 __Create a User type.__
 
-```
+```javascript
 yod.type('User', {
   name: '@String(5)',
   age: '@Int'
@@ -50,7 +50,7 @@ yod.type('User', {
 
 __And then you can generate random User by calling `yod('@User')`.__
 
-```
+```javascript
 yod('@User'); 
 
 // Will create a random object like: `{name: 'atx', age: 30}`.
@@ -78,7 +78,7 @@ In `generator`, you can use caller string, you can execute javascript, you can g
 
 #### Yod example:
 
-```
+```javascript
 // Execute javascript, wrapped in "`" (just calling `eval` to get the result)
 yod("` 1 + 3 `");     // => 4
 yod("` 'a' + 3 `");   // => 'a3'
@@ -106,7 +106,7 @@ Create a new type, so that you can use it in caller string.
 
 #### Type example:
 
-```
+```javascript
 // Create a Bool type, and alias Boolean. it will random return true or false.
 yod.type('Bool', function() {
 
@@ -146,7 +146,7 @@ __There are two type or modifier__
 
 __Create a value modifier: index —— Get array's index item__
 
-```
+```javascript
 yod.modifier('Array', 'index', function(val, index) {
   return val[index];
 });
@@ -164,7 +164,7 @@ yod({
 
 __Create a function modifier: repeat —— Generate value array using generator function__
 
-```
+```javascript
 yod.modifier('repeat', function(generatorFn, times) {
   var result = [];
   for (var i = 0; i < times; i++) {
@@ -201,7 +201,7 @@ then the result will be something like this: `{val: ..., meta: ...}`
 
 #### Config example:
 
-```
+```javascript
 // Set
 yod.config('a.b', 'ab');
 yod.config('a.c', 'ac', 'ac-meta');
@@ -239,14 +239,14 @@ All meta data.
 
 * Caller string's arguments can not include ")".
 
-  ```
+  ```javascript
   @String.replace(")", "") 
   // Will parsed to `@String.replace('"')`
   ```
   
 * Object generator can not recycle depends.
 
-  ```
+  ```javascript
   yod({
     a: '@Self.b',
     b: '@Self.a'
@@ -257,7 +257,7 @@ All meta data.
   
 * Child object can't depend on it parents, similar to recycle depends.
 
-  ```
+  ```javascript
   yod({
     a: {
       b: {
@@ -273,14 +273,14 @@ All meta data.
 
 ### Browser
 
-```
+```bash
 bower install yod --save-dev
 ```
 
 
 ### Node
 
-```
+```bash
 npm install yod --save
 ```
 

@@ -27,6 +27,7 @@ function _call(caller, pair) {
   var firstSer = series[0], value;
 
   // parse series's arguments till end to true.
+  // @FIXED : Caller 中包含其它 caller， e.g @Range(@Self.age, 50)
   _.each(series, function(ser) {
     _.each(ser.args, function(arg, i) {
       var parsedArg = _parseStr(arg, pair);
@@ -104,7 +105,7 @@ function _parseStr(str, pair) {
   if (str.charAt(0) === '`' && str.slice(-1) === '`') {
     /* jshint ignore:start */
     try {
-      eval('var variable=' + str.substr(1, str.length - 2));
+      eval('eval')('var variable=' + str.substr(1, str.length - 2));
       return variable;
     } catch (e) { throw new Error('Execute script "' + str + '" error.'); }
     /* jshint ignore:end */

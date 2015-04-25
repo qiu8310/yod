@@ -114,7 +114,7 @@ var helper = {
    * // => ['@Bool']
    *
    *
-   * helper.getDepends(['@Self.baby is a baby', '@String.upper is a random uppercase string'])
+   * helper.getCaller(['@Self.baby is a baby', '@String.upper is a random uppercase string'])
    * // => ['@Self.baby', '@String.upper']
    */
   getCallers: function() {
@@ -122,8 +122,8 @@ var helper = {
       var matches;
       if (!_.isString(param)) { return result; }
 
-      // @TODO: 引号中可能会含有括号 "(", ")"，它们会影响正则的匹配，所以先保存括号中的引号内的字符
-      // @TODO: e.g: @String.replace('(', ')')
+      // @TODO: 引号中可能会含有括号 ")"，它们会影响正则的匹配，所以先保存括号中的引号内的字符
+      // @TODO: e.g: @String.replace( ')')
 
       while ((matches = _reCaller.exec(param))) {
         result.push(matches[2]);
