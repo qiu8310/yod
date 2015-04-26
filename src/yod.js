@@ -107,6 +107,18 @@ yod.emptyModifiers = function() { tm.clean('modifier'); };
  */
 yod.config = config;
 
+/**
+ * all types
+ * @type {Object}
+ */
+yod.types = tm.type.all;
+
+/**
+ * all modifiers
+ * @type {Object}
+ */
+yod.modifiers = tm.modifier.all;
+
 if (typeof window !== 'undefined') { window.yod = yod; }
 
 module.exports = yod;

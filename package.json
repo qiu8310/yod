@@ -27,7 +27,8 @@
     "dep.js": "0.0.2",
     "jsonfy": "^0.1.0",
     "lodash": "^3.7.0",
-    "sprintf-js": "^1.0.2"
+    "sprintf-js": "^1.0.2",
+    "sscan": "^0.1.3"
   },
   "devDependencies": {
     "coveralls": "^2.11.1",

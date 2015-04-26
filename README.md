@@ -10,6 +10,8 @@
 
 Fantasy data generator.
 
+@TODO 需要发布 sscan 0.2.0
+
 
 [Online Object Data Generator](http://qiu8310.github.io/yod)
 
@@ -122,6 +124,10 @@ yod('@Boolean');  // return true or false.
 
 ```
 
+### yod.types
+
+All defined types.
+
 ### yod.emptyTypes()
 
 Remove all defined types.
@@ -181,6 +187,9 @@ yod('@Bool.repeat(3)');
 
 ```
 
+### yod.modifiers
+
+All defined modifiers.
 
 ### yod.emptyModifiers()
 
@@ -261,7 +270,7 @@ All meta data.
   yod({
     a: {
       b: {
-        c: '@Parent.Parent.a
+        c: '@Parent.Parent.a'
       }
     }
   });
