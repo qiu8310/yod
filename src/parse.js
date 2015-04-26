@@ -15,6 +15,7 @@ var scan = require('sscan');
  * - 还需要支持 @Caller 内嵌 @Caller， 如 @Some.foo(@Other.bar(), true)
  * - @ 前面带有转义字符 \ 时，会去掉 \ 并忽略此 Caller，如果其它字符出现转义字符 \，不做任何处理
  * - 支持将一个完整的 @Caller 结构写在${...}中
+ * - 支持在 @ 后面直接接一个值，如 @({...}).repeat
  *
  * @param {String} str
  * @returns {Object} - 返回的结果像这个 {tpl: "abc _ def _ end", args: [ [CallerStruct], [CallerStruct] ]}
@@ -49,7 +50,7 @@ function parse (str) {
       if (ch in pairs) {
         args.push(s.takePair(ch, pairs[ch]));
         s.white();
-      } else if (ch === '@' && /\w/.test(s.peek())) {
+      } else if (ch === '@' && /[\w\(]/.test(s.peek())) {
         s.next();
         args.push(takeCaller(s));
       } else {  // 当作字符串处理
@@ -61,8 +62,8 @@ function parse (str) {
       s.white();
       if (s.isChar(')')) {
         ch = false; // 退出
-      } else if (s.isChar(',')) {
-        s.next(); // 继续下一个参数
+      } else {
+        s.next(','); // 继续下一个参数
       }
     }
     return args;
@@ -73,9 +74,13 @@ function parse (str) {
    * @param {Scanner} s
    * @returns {{}}
    */
-  var takeOneChain = function(s) {
+  var takeOneChain = function(s, isFirst) {
     var obj = {};
-    obj.name = s.takeWord();
+    if (isFirst && s.isChar('(')) {
+      obj.name = true;
+    } else {
+      obj.name = s.takeWord();
+    }
 
     if (s.isChar('(')) { // 带有参数
       s.next();
@@ -94,7 +99,7 @@ function parse (str) {
   var takeCaller = function(s) {
     var stack = []; // caller 中有串式的 stack
 
-    stack.push(takeOneChain(s));
+    stack.push(takeOneChain(s, true));
     while (s.isChar('.') && /\w/.test(s.peek())) { // 继续串式调用
       s.next();
       stack.push(takeOneChain(s));
@@ -112,15 +117,15 @@ function parse (str) {
         done();
       }
 
-      if (ch === '\\' && /@\w/.test(s.peek(2))) {
+      if (ch === '\\' && /@[\w\(]/.test(s.peek(2))) {
         tpl += s.next();
         ch = s.next();
-      } else if (ch === '$' && /\{@\w/.test(s.peek(3))) {
+      } else if (ch === '$' && /\{@[\w\(]/.test(s.peek(3))) {
         left = '${';
         s.next();
         ch = s.next();
       }
-      if (ch === '@' && /\w/.test(s.peek())) {
+      if (ch === '@' && /[\w\(]/.test(s.peek())) {
         s.next(); // 去掉 @
 
         caller = takeCaller(s);
@@ -141,7 +146,7 @@ function parse (str) {
         s.next();
       }
     });
-  } catch (e) { throw new SyntaxError('Parse ' + str + 'error.'); }
+  } catch (e) { throw new SyntaxError('Parse error on ' + str); }
 
   return {tpl: tpl, args: callerStack};
 }

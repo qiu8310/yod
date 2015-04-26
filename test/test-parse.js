@@ -64,6 +64,7 @@ describe('caller parse', function() {
       matchArgs(parse('@a(true, [ab,"d]e"])').args, 1, [{name: 'a', args: ['true', '[ab,"d]e"]']}]);
       matchArgs(parse('@a({"}}", aks})').args, 1, [{name: 'a', args: ['{"}}", aks}']}]);
     });
+
   });
 
   context('caller chain', function() {
@@ -162,13 +163,28 @@ describe('caller parse', function() {
       matchArgs(parse('@a(,a)').args, 1, [{name: 'a', args: ['', 'a']}]);
       matchArgs(parse('@a(,a,)').args, 1, [{name: 'a', args: ['', 'a', '']}]);
     });
+
+    it('should support caller without type', function() {
+      parse('@()').tpl.should.eql('_');
+      matchArgs(parse('@()').args, 1, [{name: true, args: []}]);
+
+      matchArgs(parse('@({a}, @b)').args, 1, [{name: true, args: ['{a}', [{name: 'b'}]]}])
+    });
   });
 
   context('throws', function() {
-    it('not matched pair', function() {
-      (function() { parse('@a(') }).should.throw();
-      (function() { parse('@a(")') }).should.throw();
-      (function() { parse('@a(\')') }).should.throw();
+    it('caller not matched pair', function() {
+      (function() { parse('@(@a()'); }).should.throw();
+      (function() { parse('@('); }).should.throw();
+      (function() { parse('@a('); }).should.throw();
+      (function() { parse('@a(")'); }).should.throw();
+      (function() { parse('@a(\')'); }).should.throw();
+    });
+
+    it('arguments not matched pair', function() {
+      (function() { parse('@a([] a,)'); }).should.throw();
+      (function() { parse('@a({} a)'); }).should.throw();
+      (function() { parse('@a("" a)'); }).should.throw();
     });
   });
 
