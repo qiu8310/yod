@@ -10,6 +10,7 @@
 
 Fantasy data generator.
 
+Use [yod-mock](https://github.com/qiu8310/yod-mock) for more pre-defined types and modifiers..
 
 [Online Object Data Generator](http://qiu8310.github.io/yod)
 
