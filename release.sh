@@ -40,7 +40,7 @@ if test $# -gt 0; then
   git-changelog -t $1 \
     && git-release $1 \
     && echo 'npm publish ... ' \
-    && npm publish
+    && npm publish -d
 else
   echo '\033[31m version number required \033[0m'
   exit 1

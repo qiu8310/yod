@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  */
 
-var parse = require('../src/parse'),
+var parse = require('../src/obj/str/engine'),
   assert = require('should');
 
 function matchArgs(args, len) {
@@ -22,7 +22,7 @@ function matchArgs(args, len) {
   });
 }
 
-describe('caller parse', function() {
+describe('str parse engine', function() {
   context('no caller', function() {
     it('should parse empty string successfully', function() {
       assert.deepEqual(parse(''), {tpl: '', args: []});

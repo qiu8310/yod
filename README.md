@@ -13,6 +13,25 @@ Fantasy data generator.
 @TODO 需要发布 sscan 0.2.0
 
 
+Add caller string parse enging.
+
+之前是用正则表达式来匹配 Caller 结构的，会出现很多问题，比如：() 之间中不能出现 )。
+
+1. 现在完全是一个一个字符去解析 Caller，可以精确的得到它内部的每个 Caller 结构。
+
+2. 同时支持在 Caller 中的参数中添加执行 JS 的功能。
+
+3. 支持使用反斜杠转义 Caller， 如 '\@abc' 语句不会得到执行，只会是得到一个字符串 '@abc'，里面的 \ 去掉了；
+   如果 \ 不是出现在 Caller 结构体前面，则不会被去掉。
+
+__限制__
+
+* 参数中如果第一个是 '、"、[、{ 或 ` 时，它一定要匹配一个成对的字符，否则会报错；
+  如果它们不是出现在参数的第一个位置，则没有影响；
+
+* 参数的第一个如果是 @\w 的形式，会被解析成一个 Caller，如果解析不成功，会报错，如果不想解析，可以加上引号或使用 \。
+
+
 [Online Object Data Generator](http://qiu8310.github.io/yod)
 
 
@@ -128,6 +147,16 @@ yod('@Boolean');  // return true or false.
 
 All defined types.
 
+
+### yod.isTypeNameExists(name)
+
+Check if the type name exists.
+
+### yod.isTypeNameValid(name)
+
+Check if the type name is a valid.
+
+
 ### yod.emptyTypes()
 
 Remove all defined types.
@@ -190,6 +219,14 @@ yod('@Bool.repeat(3)');
 ### yod.modifiers
 
 All defined modifiers.
+
+### yod.isModifierNameExists(name)
+
+Check if the modifier name exists.
+
+### yod.isModifierNameValid(name)
+
+Check if the modifier name is a valid.
 
 ### yod.emptyModifiers()
 

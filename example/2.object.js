@@ -12,11 +12,15 @@ module.exports = function(yod, assert, _) {
     a: ['a'],
     b: 'b',
     c: 'c',
-    o: {x: 'x', y: 'y', z: '@Parent.c'},
-
+    d: '@(dd)',
+    e: '@()',
+    o: {x: 'x', y: 'y', z: '@Parent.c', deep: { u: 'u', v: '@Parent.Parent.s' }},
+    s: {s: 's'},
     x: '@Self.o.x',
     y: '@Self.o.y@Self.o.y',
     z: '`"@Self.o.z" + "@Self.o.z"`',
+
+    deep: '@Self.o.deep.u',
 
     l: '@Self.a.length'
   });
@@ -26,11 +30,15 @@ module.exports = function(yod, assert, _) {
     a: ['a'],
     b: 'b',
     c: 'c',
-    o: {x: 'x', y: 'y', z: 'c'},
-
+    d: 'dd',
+    e: '',
+    o: {x: 'x', y: 'y', z: 'c', deep: { u: 'u', v: {s: 's'}}},
+    s: {s: 's'},
     x: 'x',
     y: 'yy',
     z: 'cc',
+
+    deep: 'u',
 
     l: 1
   });

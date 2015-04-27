@@ -9,7 +9,6 @@
 'use strict';
 var _ = require('lodash'),
   type = require('./type'),
-  helper = require('./helper'),
   modifier = require('./modifier');
 
 /**
@@ -96,7 +95,6 @@ tm.clean = function(arg) {
 };
 
 
-var _reModCaller = /^(\w+)(?:\((.*)\))?$/;
 /**
  * Function's modifier generator
  * @param {Function} fn
@@ -104,15 +102,7 @@ var _reModCaller = /^(\w+)(?:\((.*)\))?$/;
  * @returns {Function}
  */
 tm.fnGenerator = function(fn, modSeries) {
-  modSeries = _.map(modSeries ? [].concat(modSeries) : [], function(ser) {
-    if (_.isString(ser) && _reModCaller.test(ser)) {
-      return {name: RegExp.$1, args: RegExp.$2 ? helper.parseArgsStrToArray(RegExp.$2) : []};
-    } else if (ser.name) {
-      return ser;
-    }
-    throw new Error('Modifier argument "' + ser + '" error.');
-  });
-  return _.reduce(modSeries, function(fn, mod) {
+  return _.reduce([].concat(modSeries ? modSeries : []), function(fn, mod) {
     return modifier.generator(fn, mod.name, mod.args, mod.ctx);
   }, fn);
 };
@@ -154,6 +144,8 @@ tm.generator = function(typeName, series) {
   return tm.fnGenerator(fn, mods);
 };
 
+tm.t = type;
+tm.m = modifier;
 
 module.exports = tm;
 

@@ -59,7 +59,7 @@ describe('config', function () {
 
   });
 
-  context('caller', function() {
+  context('yod caller', function() {
     it('should callable', function() {
       assert.deepEqual(yod('@Config.test.a'), {b: 'ab'});
       assert.deepEqual(yod('@Config.test.a.b'), 'ab');

@@ -8,9 +8,11 @@
 
 var _ = require('lodash');
 
-var gen = require('./lib/generator'),
-  config = require('./lib/config'),
-  tm = require('./lib/tm');
+var config = require('./config'),
+  gen = require('./obj/obj').generator,
+  tm = require('./tm/tm');
+
+
 
 /**
  * Generate random data according generator.
@@ -95,6 +97,11 @@ yod.emptyTypes = function() { tm.clean('type'); };
  */
 yod.emptyModifiers = function() { tm.clean('modifier'); };
 
+yod.isTypeNameExists = tm.t.isNameExists;
+yod.isTypeNameValid = tm.t.isNameValid;
+yod.isModifierNameExists = tm.m.isNameExists;
+yod.isModifierNameValid = tm.m.isNameValid;
+yod._ = _;
 
 /**
  * Set or get config key.

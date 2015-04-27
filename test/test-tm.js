@@ -8,9 +8,9 @@
 
 var assert = require('should');
 var _ = require('lodash');
-var tm = require('../src/lib/tm');
-var t = require('../src/lib/type');
-var m = require('../src/lib/modifier');
+var tm = require('../src/tm/tm');
+var t = require('../src/tm/type');
+var m = require('../src/tm/modifier');
 
 var eptFn = function() {};
 
@@ -27,9 +27,6 @@ describe('tm', function() {
       tm.generator([{name: 'X', args: ['args'], ctx: {x: 'ctx'}}])().should.eql('args');
     });
 
-    it('should throws when fn is not a function', function() {
-      assert.throws(function() { tm.type('A', 'B', 'xx'); }, /Argument "xx" should be a function/)
-    });
 
     it('should create alias', function() {
       tm.type('A', 'B', function() { return ''; });
@@ -46,23 +43,17 @@ describe('tm', function() {
       assert.doesNotThrow(function() { tm.type('X', eptFn); });
     });
 
-    it('should not throws when type exists', function() {
-      tm.type('F', eptFn);
-      assert.doesNotThrow(function() { tm.type('F', eptFn); }, /Type "F" already exists/);
-      assert.doesNotThrow(function() { tm.type('G', eptFn); });
-    });
-
     it('should throws when type name is invalid', function() {
-      assert.throws(function() { tm.type('x', eptFn)}, /Type "x" is not a valid type name/);
-      assert.throws(function() { tm.type('X-t', eptFn)}, /Type "X\-t" is not a valid type name/);
+      assert.throws(function() { tm.type('x', eptFn)});
+      assert.throws(function() { tm.type('X-t', eptFn)});
     });
 
     it('should throws when alias type name is invalid', function() {
-      assert.throws(function() { tm.type('X', 'x', eptFn); }, /Type "x" is not a valid type name/);
+      assert.throws(function() { tm.type('X', 'x', eptFn); });
     });
 
     it('should throws when alias target not exists', function() {
-      assert.throws(function() {t.alias('X', 'Y'); }, /Type "Y" not exists, can\'t alias to/);
+      assert.throws(function() {t.alias('X', 'Y'); });
     });
 
     it('should not throws when alias source exists', function() {
@@ -78,12 +69,14 @@ describe('tm', function() {
 
   context('.modifier', function() {
     it('should throws when modifier name is invalid', function() {
-      assert.throws(function() { tm.modifier('X', eptFn) }, /Modifier "X" is not a valid modifier name/);
-      assert.throws(function() { tm.modifier('x-a', eptFn) }, /Modifier "x\-a" is not a valid modifier name/);
+      assert.throws(function() { tm.modifier('X', eptFn) });
+      assert.throws(function() { tm.modifier('x-a', eptFn) });
     });
 
-    it('should throws when no function argument', function() {
-      (function() { tm.modifier('String', 'a', 'b'); }).should.throw('Argument "b" should be a function.');
+
+    it('should throws when modifier filter is invalid', function() {
+      (function() {tm.modifier('NoExistFilter', 'cap', eptFn);}).should.throw(/Modifier filter string value should in/);
+      (function() {tm.modifier([true, 1], 'cap', eptFn); }).should.throw(/Modifier filter should be String or Function/);
     });
 
     it('should not throws when modifier exists', function() {
@@ -91,11 +84,6 @@ describe('tm', function() {
         tm.modifier('y', eptFn);
         tm.modifier('y', eptFn);
       }).should.not.throw('Modifier "y" already exists, can\'t create.');
-    });
-
-    it('should throws when modifier filter is invalid', function() {
-      (function() {tm.modifier('NoExistFilter', 'cap', eptFn);}).should.throw(/Modifier filter string value should in/);
-      (function() {tm.modifier([true, 1], 'cap', eptFn); }).should.throw(/Modifier filter should be String or Function/);
     });
 
     it('should actual work', function() {
@@ -151,13 +139,6 @@ describe('tm', function() {
     it('should support empty modifier', function() {
       tm.fnGenerator(function() {return 'a';})().should.eql('a');
     });
-    it('should support string modifier', function() {
-      var fn = tm.fnGenerator(function() { return 'ab'; }, 'replace(a, b)');
-      fn().should.eql('bb');
-
-      fn = tm.fnGenerator(function() { return 'ab'; }, ['replace(a, b)', 'length']);
-      fn().should.eql(2);
-    });
 
     it('should support obj modifier', function() {
       var fn = tm.fnGenerator(function() { return 'ab'; }, {name: 'replace', args: ['a', 'b']});
@@ -165,12 +146,6 @@ describe('tm', function() {
 
       fn = tm.fnGenerator(function() { return 'ab'; }, [{name: 'replace', args: ['a', 'b']}, {name: 'length'}]);
       fn().should.eql(2);
-    });
-
-    it('otherwise, should throws', function() {
-      (function() {
-        tm.fnGenerator(eptFn, true);
-      }).should.throw(/^Modifier argument.*? error\.$/)
     });
   });
 

@@ -6,7 +6,6 @@
  * Licensed under the MIT license.
  */
 
-var sprintf = require('sprintf-js').sprintf;
 var _ = require('lodash');
 
 /**
@@ -23,18 +22,25 @@ var modifier = {};
 var all = modifier.all = {};
 
 var _reValid = /^[a-z]\w*$/,
-  _msgNoValid = 'Modifier "%s" is not a valid modifier name, it should match /^[a-z]\\w*$/',
   _allowedFilterStrings = ['String', 'Array', 'Object', 'PlainObject', 'Number', 'Boolean'];
 
 /**
  * Check if modifier name is valid
  * @param {String} name
  * @returns {Boolean}
- * @private
  */
-function _isValidModifierName(name) {
-  return _reValid.test(name);
-}
+modifier.isNameValid = function(name) {
+  return _.isString(name) && _reValid.test(name);
+};
+
+/**
+ * Check if modifier name is exists
+ * @param {String} name
+ * @returns {Boolean}
+ */
+modifier.isNameExists = function(name) {
+  return name && (name in all);
+};
 
 /**
  * Create a new modifier
@@ -52,10 +58,6 @@ modifier.create = function(filters, name, fn, ctx) {
     filters = [];
   }
 
-  if (!_.isFunction(fn)) {
-    throw new Error(sprintf('Argument "%s" should be a function.', fn));
-  }
-
   var isPreHook = false;
 
   if (name.charAt(0) === ':') {
@@ -63,25 +65,24 @@ modifier.create = function(filters, name, fn, ctx) {
     name = name.substr(1);
   }
 
-  if (all[name]) {
-    console.warn('Modifier "%s" already exists, you are overwriting it!', name);
-    //throw new Error(sprintf('Modifier "%s" already exists, can\'t create.', name));
+  if (modifier.isNameExists(name)) {
+    console.warn('Modifier "' + name + '" already exists, you are overwriting it!');
   }
 
-  if (!_isValidModifierName(name)) {
-    throw new Error(sprintf(_msgNoValid, name));
+  if (!modifier.isNameValid(name)) {
+    throw new Error('Modifier "' + name + '" is not valid, it should match ' + _reValid + '.');
   }
 
   filters = _.map(filters, function(filter) {
     if (_.isString(filter)) {
       if (!_.includes(_allowedFilterStrings, filter)) {
-        throw new Error(sprintf('Modifier filter string value should in "%s"', _allowedFilterStrings.join('", "')));
+        throw new Error('Modifier filter string value should in "' + _allowedFilterStrings.join('", "') + '"');
       }
       return _['is' + filter];
     } else if (_.isFunction(filter)) {
       return filter;
     } else {
-      throw new Error(sprintf('Modifier filter should be String or Function, not %s', typeof filter));
+      throw new Error('Modifier filter should be String or Function, not "' + (typeof filter) + '"');
     }
   });
 
@@ -143,7 +144,7 @@ modifier.generator = function(prevGenerator, name, args, ctx) {
     fn = function() {
       var rtn = prevGenerator();
       if (_.isUndefined(rtn[name])) {
-        throw new Error(sprintf('Modifier "%s" not exists.', name));
+        throw new Error('Modifier "' + name + '" not exists.');
       }
 
       if (_.isFunction(rtn[name])) {

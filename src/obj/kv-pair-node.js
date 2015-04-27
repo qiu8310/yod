@@ -7,7 +7,6 @@
  */
 
 var _ = require('lodash');
-var sprintf = require('sprintf-js').sprintf;
 var KVPair = require('./kv-pair');
 
 /**
@@ -41,9 +40,9 @@ function KVPairNode(obj, parent) {
     if (_.isPlainObject(value)) {
       value = new KVPairNode(value, this);
     }
-
     this.kvPairs.push(new KVPair(key, value, this));
   }, this);
+
 }
 
 /**
@@ -52,22 +51,8 @@ function KVPairNode(obj, parent) {
  *
  * @returns {String}
  */
-KVPairNode.prototype.toString = function() { return JSON.stringify(this.obj); };
+KVPairNode.prototype.toString = function() { return 'KVPairNode' + JSON.stringify(this.obj); };
 
-/**
- * Get all pairs, include the sub object's pairs.
- * @returns {Array}
- */
-KVPairNode.prototype.getAllPairs = function() {
-  var result = [];
-  _.each(this.kvPairs, function(pair) {
-    result.push(pair);
-    if (pair.hasChildPairs) {
-      result.push.apply(result, pair.value.getAllPairs());
-    }
-  });
-  return result;
-};
 
 /**
  * Find a pair in current object by pair's key
@@ -87,16 +72,16 @@ KVPairNode.prototype.findPairByKey = function(key) {
 KVPairNode.prototype.getValue = function() {
   var obj = {};
   _.each(this.kvPairs, function(pair) {
-    var key = pair.getKey();
-    var val = pair.getValue();
+    var key = pair.getKey([]);  // 空数组用来判断是否有循环依赖，在逐层调用时，这个数组会把先后调用的 pair 放入其中
+    var val = pair.getValue([]);
 
-    if (!_.isString(key)) { throw new Error(sprintf('Object key "%s" should be String.', pair.key)); }
-    if (obj.hasOwnProperty(key)) { throw new Error(sprintf('Object key "%s" duplicated on "%s"', pair.key, key)); }
+    if (obj.hasOwnProperty(key)) { throw new Error('Object key "' + pair.key + '" duplicated.'); }
 
-    obj[key] = val;
+    obj[String(key)] = val;
   });
 
   return obj;
 };
+
 
 module.exports = KVPairNode;
