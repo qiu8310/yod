@@ -67,12 +67,17 @@ describe('config', function () {
 
     it('should modifiable', function() {
       assert.deepEqual(yod('@Config.test.a.b.length'), 2);
+
+      yod.modifier('sample', function(d) { return _.sample(d); });
+      yod.config('test.a', {aa: ['c', 'd']});
+      ['c', 'd'].should.containEql(yod('@Config.test.a.aa.sample'));
     });
 
     it('should throws', function() {
       (function() { yod('@Config'); }).should.throw(/Config key "" not found./);
       (function() { yod('@Config.notExist'); }).should.throw(/Config key "notExist" not found./);
     });
+
   });
 
 });

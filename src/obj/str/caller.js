@@ -35,12 +35,10 @@ function _callConfig(caller) {
   if (!ser || ser.args || !value.hasOwnProperty(ser.name)) {
     throw new Error('Config key "' + (ser && ser.name || '') + '" not found.');
   }
-  series.shift();
   while (ser && !ser.args && value.hasOwnProperty(ser.name)) {
     value = value[ser.name];
     ser = series.shift();
   }
-
   return tm.fnGenerator(function () {
     return value;
   }, series)();
