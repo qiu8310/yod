@@ -1,7 +1,7 @@
 {
   "name": "yod",
   "description": "Fantasy data generator.",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "homepage": "https://github.com/qiu8310/yod",
   "bugs": "https://github.com/qiu8310/yod/issues",
   "license": "MIT",
@@ -40,6 +40,7 @@
     "webpack": "^1.8.9"
   },
   "scripts": {
+    "lodash": "lodash exports=node --production && mv lodash.custom.min.js node_modules/lodash/index.js",
     "cover": "open coverage/lcov-report/index.html",
     "docs": "rm -rf docs && ./node_modules/.bin/jsdoc -c ./jsdoc.json ./README.md && echo 'code{padding: 2px 4px;font-size: 90%;color:#c7254e;background-color:#f9f2f4;border-radius:4px;}' >> ./docs/styles/jsdoc-default.css",
     "coveralls": "gulp test && cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
