@@ -34,7 +34,7 @@ if test $# -gt 0; then
   fi
 
   ./node_modules/.bin/webpack src/yod.js --output-file="browser/yod.js"
-  ./node_modules/.bin/webpack src/yod.js --output-file="browser/yod.min.js" --optimize-minimize
+  ./node_modules/.bin/webpack src/yojjjd.js --output-file="browser/yod.min.js" --optimize-minimize
   cp browser/yod.* gh-pages
 
   git-changelog -t $1 \
