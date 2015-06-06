@@ -14,7 +14,7 @@ var exec = require('./exec');
 /**
  * 解析字符串中的 Caller 调用，如果是数组，则遍历数组中的字符串，如果是其它类型，则直接返回
  * @param {String|Array|*} any
- * @param {[KVPair]} pairStack
+ * @param {Array<KVPair>} pairStack
  * @returns {*}
  */
 function parse (any, pairStack) {

@@ -79,7 +79,7 @@ KVPair.prototype.isParentOf = function(pair) {
 /**
  * 循环依赖检查
  * @param {KVPair} current
- * @param {[KVPair]} stack
+ * @param {Array<KVPair>} stack
  * @private
  */
 function _recycleCheck(current, stack) {

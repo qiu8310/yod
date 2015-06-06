@@ -90,7 +90,7 @@ function _callDepend(caller, pairStack) {
 
 /**
  * 先把它内部的子 Caller 解析了
- * @param {[KVPair]} pairStack
+ * @param {Array<KVPair>} pairStack
  */
 Caller.prototype.getValue = function(pairStack) {
   // 解析每个 Caller 中的参数的值
