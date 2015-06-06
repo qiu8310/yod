@@ -586,7 +586,7 @@
 	"\xe0":"a","\xe1":"a","\xe2":"a","\xe3":"a","\xe4":"a","\xe5":"a","\xc7":"C","\xe7":"c","\xd0":"D","\xf0":"d","\xc8":"E","\xc9":"E","\xca":"E","\xcb":"E","\xe8":"e","\xe9":"e","\xea":"e","\xeb":"e","\xcc":"I","\xcd":"I","\xce":"I","\xcf":"I","\xec":"i","\xed":"i","\xee":"i","\xef":"i","\xd1":"N","\xf1":"n","\xd2":"O","\xd3":"O","\xd4":"O","\xd5":"O","\xd6":"O","\xd8":"O","\xf2":"o","\xf3":"o","\xf4":"o","\xf5":"o","\xf6":"o","\xf8":"o","\xd9":"U","\xda":"U","\xdb":"U","\xdc":"U","\xf9":"u","\xfa":"u",
 	"\xfb":"u","\xfc":"u","\xdd":"Y","\xfd":"y","\xff":"y","\xc6":"Ae","\xe6":"ae","\xde":"Th","\xfe":"th","\xdf":"ss"},Pn={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;","`":"&#96;"},Bn={"&amp;":"&","&lt;":"<","&gt;":">","&quot;":'"',"&#39;":"'","&#96;":"`"},zn={"function":true,object:true},Mn={"\\":"\\","'":"'","\n":"n","\r":"r","\u2028":"u2028","\u2029":"u2029"},Dn=zn[typeof exports]&&exports&&!exports.nodeType&&exports,qn=zn[typeof module]&&module&&!module.nodeType&&module,Kn=zn[typeof self]&&self&&self.Object&&self,Vn=zn[typeof window]&&window&&window.Object&&window,Yn=qn&&qn.exports===Dn&&Dn,Zn=Dn&&qn&&typeof global=="object"&&global&&global.Object&&global||Vn!==(this&&this.window)&&Vn||Kn||this,Gn=function(){
 	try{Object({toString:0}+"")}catch(n){return function(){return false}}return function(n){return typeof n.toString!="function"&&typeof(n+"")=="string"}}(),Jn=m();Dn&&qn&&Yn&&((qn.exports=Jn)._=Jn)}).call(this);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)(module), (function() { return this; }())))
 
 /***/ },
 /* 5 */
@@ -601,7 +601,19 @@
 	 */
 
 	var _ = __webpack_require__(4);
-	var KVPair = __webpack_require__(10);
+	var KVPair = __webpack_require__(9);
+
+	function parseNodeValue(target, ctx) {
+	  if (_.isPlainObject(target)) {
+	    return new KVPairNode(target, ctx);
+	  } else if (_.isArray(target)) {
+	    return _.map(target, function(v) {
+	      return parseNodeValue(v, ctx);
+	    });
+	  } else {
+	    return target;
+	  }
+	}
 
 	/**
 	 *
@@ -631,9 +643,7 @@
 
 	  // parse
 	  _.each(obj, function(value, key) {
-	    if (_.isPlainObject(value)) {
-	      value = new KVPairNode(value, this);
-	    }
+	    value = parseNodeValue(value, this);
 	    this.kvPairs.push(new KVPair(key, value, this));
 	  }, this);
 
@@ -661,13 +671,16 @@
 
 	/**
 	 * Get a generated object value.
+	 * @param {Array<KVPair>} pairStack - 对象中的数组如果包含一个对象，解析时会传这个 pairStack 过来
 	 * @returns {Object}
 	 */
-	KVPairNode.prototype.getValue = function() {
+	KVPairNode.prototype.getValue = function(pairStack) {
 	  var obj = {};
+	  pairStack = pairStack || []; // 空数组用来判断是否有循环依赖，在逐层调用时，这个数组会把先后调用的 pair 放入其中
 	  _.each(this.kvPairs, function(pair) {
-	    var key = pair.getKey([]);  // 空数组用来判断是否有循环依赖，在逐层调用时，这个数组会把先后调用的 pair 放入其中
-	    var val = pair.getValue([]);
+	    // key 和 val 的 Stack 必须独立
+	    var key = pair.getKey([].concat(pairStack));
+	    var val = pair.getValue([].concat(pairStack));
 
 	    if (obj.hasOwnProperty(key)) { throw new Error('Object key "' + pair.key + '" duplicated.'); }
 
@@ -693,15 +706,15 @@
 	 * Licensed under the MIT license.
 	 */
 
-	var Caller = __webpack_require__(11);
-	var engine = __webpack_require__(12);
+	var Caller = __webpack_require__(10);
+	var engine = __webpack_require__(11);
 	var _ = __webpack_require__(4);
-	var exec = __webpack_require__(13);
+	var exec = __webpack_require__(12);
 
 	/**
 	 * 解析字符串中的 Caller 调用，如果是数组，则遍历数组中的字符串，如果是其它类型，则直接返回
 	 * @param {String|Array|*} any
-	 * @param {[KVPair]} pairStack
+	 * @param {Array<KVPair>} pairStack
 	 * @returns {*}
 	 */
 	function parse (any, pairStack) {
@@ -709,8 +722,9 @@
 	    return _.map(any, function(k) { return parse(k, [].concat(pairStack)); });
 	  }
 
+	  // 数组中有可能包含一个 Object，所以还要用下 any.getValue
+	  //if (!_.isString(any)) { return any && any.getValue ? any.getValue([].concat(pairStack)) : any; }
 	  if (!_.isString(any)) { return any; }
-
 
 	  var parsedStr = engine(any),
 	    tpl = parsedStr.tpl,
@@ -1019,22 +1033,6 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/*
 	 * yod
 	 * https://github.com/qiu8310/yod
@@ -1116,7 +1114,7 @@
 	/**
 	 * 循环依赖检查
 	 * @param {KVPair} current
-	 * @param {[KVPair]} stack
+	 * @param {Array<KVPair>} stack
 	 * @private
 	 */
 	function _recycleCheck(current, stack) {
@@ -1150,11 +1148,19 @@
 	KVPair.prototype.getValue = function(stack) {
 	  _recycleCheck(this, stack);
 	  stack.push(this);
+	  var val = this.value;
+
 	  if (this.resolvedValue === null) {
 	    if (this.hasChildPairs) {
-	      this.resolvedValue = this.value.getValue(); // 调用 node 的 getValue
+	      this.resolvedValue = val.getValue(); // 调用 node 的 getValue
 	    } else {
-	      this.resolvedValue = parse(this.value, stack);
+	      if (_.isArray(val)) {
+	        this.resolvedValue = _.map(val, function(v) {
+	          return v && v.getValue ? v.getValue(stack) : parse(v, [].concat(stack));
+	        });
+	      } else {
+	        this.resolvedValue = parse(this.value, stack);
+	      }
 	    }
 	  }
 	  return this.resolvedValue;
@@ -1164,7 +1170,7 @@
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -1178,7 +1184,7 @@
 	var jsonfy = __webpack_require__(14);
 	var tm = __webpack_require__(3);
 	var allConfig = __webpack_require__(1).all;
-	var exec = __webpack_require__(13);
+	var exec = __webpack_require__(12);
 
 	function Caller(series) {
 
@@ -1259,7 +1265,7 @@
 
 	/**
 	 * 先把它内部的子 Caller 解析了
-	 * @param {[KVPair]} pairStack
+	 * @param {Array<KVPair>} pairStack
 	 */
 	Caller.prototype.getValue = function(pairStack) {
 	  // 解析每个 Caller 中的参数的值
@@ -1324,7 +1330,7 @@
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -1484,7 +1490,7 @@
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -1516,6 +1522,22 @@
 	}
 
 	module.exports = exec;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
 
 
 /***/ },
