@@ -22,8 +22,9 @@ function parse (any, pairStack) {
     return _.map(any, function(k) { return parse(k, [].concat(pairStack)); });
   }
 
+  // 数组中有可能包含一个 Object，所以还要用下 any.getValue
+  //if (!_.isString(any)) { return any && any.getValue ? any.getValue([].concat(pairStack)) : any; }
   if (!_.isString(any)) { return any; }
-
 
   var parsedStr = engine(any),
     tpl = parsedStr.tpl,

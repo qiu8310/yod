@@ -113,11 +113,19 @@ KVPair.prototype.getKey = function(stack) {
 KVPair.prototype.getValue = function(stack) {
   _recycleCheck(this, stack);
   stack.push(this);
+  var val = this.value;
+
   if (this.resolvedValue === null) {
     if (this.hasChildPairs) {
-      this.resolvedValue = this.value.getValue(); // 调用 node 的 getValue
+      this.resolvedValue = val.getValue(); // 调用 node 的 getValue
     } else {
-      this.resolvedValue = parse(this.value, stack);
+      if (_.isArray(val)) {
+        this.resolvedValue = _.map(val, function(v) {
+          return v && v.getValue ? v.getValue(stack) : parse(v, [].concat(stack));
+        });
+      } else {
+        this.resolvedValue = parse(this.value, stack);
+      }
     }
   }
   return this.resolvedValue;

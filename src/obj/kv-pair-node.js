@@ -9,6 +9,18 @@
 var _ = require('lodash');
 var KVPair = require('./kv-pair');
 
+function parseNodeValue(target, ctx) {
+  if (_.isPlainObject(target)) {
+    return new KVPairNode(target, ctx);
+  } else if (_.isArray(target)) {
+    return _.map(target, function(v) {
+      return parseNodeValue(v, ctx);
+    });
+  } else {
+    return target;
+  }
+}
+
 /**
  *
  * @param {Object} obj
@@ -37,9 +49,7 @@ function KVPairNode(obj, parent) {
 
   // parse
   _.each(obj, function(value, key) {
-    if (_.isPlainObject(value)) {
-      value = new KVPairNode(value, this);
-    }
+    value = parseNodeValue(value, this);
     this.kvPairs.push(new KVPair(key, value, this));
   }, this);
 
@@ -67,13 +77,16 @@ KVPairNode.prototype.findPairByKey = function(key) {
 
 /**
  * Get a generated object value.
+ * @param {Array<KVPair>} pairStack - 对象中的数组如果包含一个对象，解析时会传这个 pairStack 过来
  * @returns {Object}
  */
-KVPairNode.prototype.getValue = function() {
+KVPairNode.prototype.getValue = function(pairStack) {
   var obj = {};
+  pairStack = pairStack || []; // 空数组用来判断是否有循环依赖，在逐层调用时，这个数组会把先后调用的 pair 放入其中
   _.each(this.kvPairs, function(pair) {
-    var key = pair.getKey([]);  // 空数组用来判断是否有循环依赖，在逐层调用时，这个数组会把先后调用的 pair 放入其中
-    var val = pair.getValue([]);
+    // key 和 val 的 Stack 必须独立
+    var key = pair.getKey([].concat(pairStack));
+    var val = pair.getValue([].concat(pairStack));
 
     if (obj.hasOwnProperty(key)) { throw new Error('Object key "' + pair.key + '" duplicated.'); }
 
