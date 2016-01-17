@@ -118,13 +118,13 @@ yod.config = config;
  * all types
  * @type {Object}
  */
-yod.types = tm.type.all;
+yod.types = tm.t.all;
 
 /**
  * all modifiers
  * @type {Object}
  */
-yod.modifiers = tm.modifier.all;
+yod.modifiers = tm.m.all;
 
 if (typeof window !== 'undefined') { window.yod = yod; }
 
